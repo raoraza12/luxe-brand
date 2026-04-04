@@ -1,0 +1,37 @@
+.orders-page { padding: 40px 0 80px; max-width: 900px; }
+.orders-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--cream); margin-bottom: 32px; }
+.order-card {
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); margin-bottom: 20px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.order-card:hover { border-color: var(--border); }
+.order-card-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding: 20px 24px; border-bottom: 1px solid var(--border-light);
+}
+.order-id { display: block; font-weight: 700; color: var(--cream); font-size: 0.92rem; }
+.order-date { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+.order-right { display: flex; align-items: center; gap: 16px; }
+.order-status {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 20px; border: 1px solid;
+}
+.order-total { font-size: 1rem; font-weight: 700; color: var(--gold); }
+.order-items-preview { display: flex; flex-direction: column; gap: 0; }
+.order-item-preview {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 24px; border-bottom: 1px solid var(--border-light);
+}
+.order-item-preview:last-child { border-bottom: none; }
+.order-item-img { width: 52px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+.order-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated); color: var(--text-muted); border-radius: 8px; }
+.order-item-name { font-size: 0.88rem; font-weight: 600; color: var(--cream); }
+.order-item-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+.order-item-price { margin-left: auto; font-size: 0.9rem; font-weight: 600; color: var(--gold); white-space: nowrap; }
+.order-card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 24px; background: var(--bg-elevated);
+  font-size: 0.78rem; color: var(--text-muted);
+}
