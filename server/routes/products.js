@@ -1,5 +1,4 @@
 const express = require('express');
-const Product = require('../models/Product');
 const { verifyToken, isAdmin } = require('../middleware/auth');
 const router = express.Router();
 
@@ -7,33 +6,47 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const { category, subcategory, featured, newArrival, bestseller, search, minPrice, maxPrice, size, sort, limit = 20, page = 1 } = req.query;
-    const query = {};
-    if (category) query.category = category;
-    if (subcategory) query.subcategory = subcategory;
-    if (featured === 'true') query.featured = true;
-    if (newArrival === 'true') query.newArrival = true;
-    if (bestseller === 'true') query.bestseller = true;
-    if (search) query.name = { $regex: search, $options: 'i' };
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+    const where = {};
+    
+    if (category) where.category = category;
+    if (subcategory) where.subcategory = subcategory;
+    if (featured === 'true') where.featured = true;
+    if (newArrival === 'true') where.newArrival = true;
+    if (bestseller === 'true') where.bestseller = true;
+    
+    if (search) {
+      where.name = { contains: search, mode: 'insensitive' };
     }
-    if (size) query.sizes = { $in: [size] };
+    
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price.gte = Number(minPrice);
+      if (maxPrice) where.price.lte = Number(maxPrice);
+    }
+    
+    if (size) {
+      where.sizes = { has: size };
+    }
 
     const sortOptions = {
-      'price-asc': { price: 1 },
-      'price-desc': { price: -1 },
-      'newest': { createdAt: -1 },
-      'rating': { rating: -1 },
-      'popular': { numReviews: -1 }
+      'price-asc': { price: 'asc' },
+      'price-desc': { price: 'desc' },
+      'newest': { createdAt: 'desc' },
+      'rating': { rating: 'desc' },
+      'popular': { numReviews: 'desc' }
     };
-    const sortBy = sortOptions[sort] || { createdAt: -1 };
+    const orderBy = sortOptions[sort] || { createdAt: 'desc' };
     const skip = (Number(page) - 1) * Number(limit);
 
     const [products, total] = await Promise.all([
-      Product.find(query).sort(sortBy).skip(skip).limit(Number(limit)),
-      Product.countDocuments(query)
+      req.prisma.product.findMany({
+        where,
+        orderBy,
+        skip,
+        take: Number(limit),
+        include: { reviews: true }
+      }),
+      req.prisma.product.count({ where })
     ]);
 
     res.json({ products, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
@@ -45,7 +58,11 @@ router.get('/', async (req, res) => {
 // GET product by slug
 router.get('/:slug', async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug });
+    const product = await req.prisma.product.findUnique({
+      where: { slug: req.params.slug },
+      include: { reviews: true }
+    });
+    
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (err) {
@@ -56,7 +73,9 @@ router.get('/:slug', async (req, res) => {
 // POST add product (admin)
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const product = await req.prisma.product.create({
+      data: req.body
+    });
     res.status(201).json(product);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -66,7 +85,10 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
 // PUT update product (admin)
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const product = await req.prisma.product.update({
+      where: { id: req.params.id },
+      data: req.body
+    });
     res.json(product);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -76,7 +98,9 @@ router.put('/:id', verifyToken, isAdmin, async (req, res) => {
 // DELETE product (admin)
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    await req.prisma.product.delete({
+      where: { id: req.params.id }
+    });
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -86,14 +110,41 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
 // POST add review
 router.post('/:id/reviews', verifyToken, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-    const alreadyReviewed = product.reviews.find(r => r.user.toString() === req.user._id.toString());
-    if (alreadyReviewed) return res.status(400).json({ message: 'Already reviewed' });
-    const review = { user: req.user._id, name: req.user.name, rating: Number(req.body.rating), comment: req.body.comment };
-    product.reviews.push(review);
-    product.updateRating();
-    await product.save();
+    const productId = req.params.id;
+    const userId = req.user.id; // Now accessing string id, not _id
+
+    const existingReview = await req.prisma.review.findFirst({
+      where: { productId, userId }
+    });
+
+    if (existingReview) return res.status(400).json({ message: 'Already reviewed' });
+
+    // Create review
+    await req.prisma.review.create({
+      data: {
+        productId,
+        userId,
+        name: req.user.name,
+        rating: Number(req.body.rating),
+        comment: req.body.comment
+      }
+    });
+
+    // Recalculate product rating
+    const aggregates = await req.prisma.review.aggregate({
+      where: { productId },
+      _avg: { rating: true },
+      _count: { rating: true }
+    });
+
+    await req.prisma.product.update({
+      where: { id: productId },
+      data: {
+        rating: aggregates._avg.rating || 0,
+        numReviews: aggregates._count.rating || 0
+      }
+    });
+
     res.status(201).json({ message: 'Review added' });
   } catch (err) {
     res.status(500).json({ message: err.message });
