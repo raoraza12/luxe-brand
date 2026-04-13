@@ -21,12 +21,12 @@ const connectDB = async () => {
 
     console.log('⏳ Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000 // Fast fail if can't connect
+      serverSelectionTimeoutMS: 4000 // Even faster fail
     });
     console.log('✅ MongoDB Connected');
   } catch (err) {
     console.error('❌ MongoDB Connection Error:', err.message);
-    throw err; // Throw so middleware catches it
+    throw err;
   }
 };
 
@@ -41,8 +41,12 @@ app.use(morgan('dev'));
 
 // Ensure DB is connected before every request
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err); // Pass error to Express error handler
+  }
 });
 
 // Temporary Seed Route
