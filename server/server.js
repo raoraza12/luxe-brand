@@ -13,10 +13,20 @@ const app = express();
 const connectDB = async () => {
   try {
     if (mongoose.connection.readyState >= 1) return;
-    await mongoose.connect(process.env.MONGO_URI);
+    
+    if (!process.env.MONGO_URI) {
+      console.error('❌ MONGO_URI is not defined in environment variables');
+      throw new Error('Database configuration missing. Please add MONGO_URI in Vercel settings.');
+    }
+
+    console.log('⏳ Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000 // Fast fail if can't connect
+    });
     console.log('✅ MongoDB Connected');
   } catch (err) {
-    console.error('❌ MongoDB Error:', err);
+    console.error('❌ MongoDB Connection Error:', err.message);
+    throw err; // Throw so middleware catches it
   }
 };
 
