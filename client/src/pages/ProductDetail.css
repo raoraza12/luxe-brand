@@ -131,9 +131,18 @@
 .review-comment { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
 
 @media (max-width: 900px) {
-  .product-detail-grid { grid-template-columns: 1fr; gap: 32px; }
-  .product-gallery { max-height: 500px; }
+  .product-detail-grid { grid-template-columns: 1fr; gap: 40px; padding-bottom: 40px; }
+  .product-gallery { flex-direction: column-reverse; width: 100%; }
+  .gallery-thumbs { flex-direction: row; width: 100%; overflow-x: auto; padding-bottom: 8px; }
+  .gallery-thumb { width: 70px; height: 84px; }
+  .product-info { text-align: center; align-items: center; }
+  .product-info-price { justify-content: center; }
+  .qty-row { justify-content: center; margin-bottom: 20px; }
+  .product-actions { flex-direction: column; width: 100%; }
+  .add-to-cart-btn { width: 100%; order: 1; }
+  .wishlist-action-btn { width: 100%; order: 2; }
 }
 @media (max-width: 500px) {
-  .gallery-thumbs { display: none; }
+  .gallery-thumbs { gap: 6px; }
+  .gallery-thumb { width: 60px; height: 72px; }
 }
