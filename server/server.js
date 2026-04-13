@@ -8,6 +8,17 @@ dotenv.config();
 
 const app = express();
 
+// Connect DB helper
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState >= 1) return;
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ MongoDB Connected');
+  } catch (err) {
+    console.error('❌ MongoDB Error:', err);
+  }
+};
+
 // Middleware
 app.use(cors({
   origin: process.env.CLIENT_URL || ['http://localhost:5173', 'http://127.0.0.1:5173'],
@@ -16,6 +27,12 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+
+// Ensure DB is connected before every request (critical for Vercel serverless)
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -35,30 +52,11 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message: err.message || 'Server Error' });
 });
 
-// Connect DB and start server
+// Start server locally (not on Vercel)
 const PORT = process.env.PORT || 5000;
 
-const connectDB = async () => {
-  try {
-    if (mongoose.connection.readyState >= 1) return;
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ MongoDB Connected');
-  } catch (err) {
-    console.error('❌ MongoDB Error:', err);
-  }
-};
-
-// Start logic
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  connectDB().then(() => {
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  });
-} else {
-  // Always ensure DB is connected before handling requests in serverless
-  app.use(async (req, res, next) => {
-    await connectDB();
-    next();
-  });
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 }
 
 // Export for Vercel Serverless
