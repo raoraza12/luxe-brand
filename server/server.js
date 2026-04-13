@@ -10,7 +10,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: process.env.CLIENT_URL || ['http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true
 }));
 app.use(express.json());
@@ -38,9 +38,28 @@ app.use((err, req, res, next) => {
 // Connect DB and start server
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+const connectDB = async () => {
+  try {
+    if (mongoose.connection.readyState >= 1) return;
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ MongoDB Connected');
+  } catch (err) {
+    console.error('❌ MongoDB Error:', err);
+  }
+};
+
+// Start logic
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  connectDB().then(() => {
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error('❌ MongoDB Error:', err));
+  });
+} else {
+  // Always ensure DB is connected before handling requests in serverless
+  app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+  });
+}
+
+// Export for Vercel Serverless
+module.exports = app;

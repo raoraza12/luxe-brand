@@ -1,0 +1,9 @@
+node_modules
+mongodb-data
+mongodb-files
+.env
+mock-server.js
+seed.js
+.git
+.github
+*.log
