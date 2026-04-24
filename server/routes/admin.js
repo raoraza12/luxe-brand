@@ -207,4 +207,48 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// --- SETTINGS MANAGEMENT ---
+router.get('/settings', async (req, res) => {
+  try {
+    const settings = await req.prisma.setting.findMany();
+    res.json(settings);
+  } catch (err) {
+    console.error('Settings Fetch Error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post('/settings', async (req, res) => {
+  try {
+    const { key, value } = req.body;
+    const setting = await req.prisma.setting.upsert({
+      where: { key },
+      update: { value },
+      create: { key, value }
+    });
+    res.json(setting);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+router.post('/settings/bulk', async (req, res) => {
+  try {
+    const { settings } = req.body; // Expecting { key: value, ... }
+    const results = await Promise.all(
+      Object.entries(settings).map(([key, value]) => 
+        req.prisma.setting.upsert({
+          where: { key },
+          update: { value },
+          create: { key, value }
+        })
+      )
+    );
+    res.json({ message: 'Settings updated successfully', count: results.length });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = router;
+

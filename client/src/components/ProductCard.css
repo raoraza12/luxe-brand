@@ -27,6 +27,7 @@
 .product-badges { position: absolute; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 2; }
 .badge-best { background: var(--bg-dark); color: var(--gold); font-size: 0.62rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border); }
 
+
 .wishlist-btn {
   position: absolute; top: 12px; right: 12px; z-index: 2;
   width: 34px; height: 34px; border-radius: 50%;

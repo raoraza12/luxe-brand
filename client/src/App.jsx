@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { SettingsProvider } from './context/SettingsContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 
@@ -30,6 +31,7 @@ import OrderManager from './pages/admin/OrderManager';
 import UserManager from './pages/admin/UserManager';
 import UserForm from './pages/admin/UserForm';
 import CouponManager from './pages/admin/CouponManager';
+import ThemeSettings from './pages/admin/ThemeSettings';
 
 const StorefrontLayout = () => (
   <>
@@ -54,7 +56,8 @@ const StorefrontLayout = () => (
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
+      <SettingsProvider>
+        <CartProvider>
         <WishlistProvider>
           <BrowserRouter>
             <ScrollToTop />
@@ -71,6 +74,7 @@ function App() {
                   <Route path="users/new" element={<UserForm />} />
                   <Route path="users/edit/:id" element={<UserForm />} />
                   <Route path="coupons" element={<CouponManager />} />
+                  <Route path="settings" element={<ThemeSettings />} />
                 </Route>
               </Route>
               
@@ -87,7 +91,8 @@ function App() {
           </BrowserRouter>
         </WishlistProvider>
       </CartProvider>
-    </AuthProvider>
+    </SettingsProvider>
+  </AuthProvider>
   );
 }
 

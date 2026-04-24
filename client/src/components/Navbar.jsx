@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FiShoppingBag, FiHeart, FiSearch, FiUser, FiMenu, FiX, FiLogOut, FiPackage } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useSettings } from '../context/SettingsContext';
 import './Navbar.css';
 
 const categories = [
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [userMenu, setUserMenu] = useState(false);
   const { user, logout } = useAuth();
   const { count, setIsOpen } = useCart();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,7 +49,7 @@ export default function Navbar() {
         <div className="navbar-inner container">
           {/* Logo */}
           <Link to="/" className="navbar-logo">
-            <span className="logo-text">LUXE</span>
+            <span className="logo-text">{settings.siteName || 'LUXE'}</span>
             <span className="logo-tagline">Haute Couture</span>
           </Link>
 
@@ -142,7 +144,7 @@ export default function Navbar() {
         <>
           <div className="overlay" onClick={() => setMobileOpen(false)} />
           <div className="mobile-menu">
-            <div className="mobile-menu-logo">LUXE</div>
+            <div className="mobile-menu-logo">{settings.siteName || 'LUXE'}</div>
             {categories.map(cat => (
               <div key={cat.label} className="mobile-cat">
                 <Link to={cat.path} className="mobile-cat-title">{cat.label}</Link>

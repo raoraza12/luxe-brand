@@ -145,7 +145,23 @@ export default function Shop() {
               <input type="number" className="form-input" placeholder="Max (Rs.)" value={filters.maxPrice} onChange={e => setFilters(p => ({ ...p, maxPrice: e.target.value }))} />
             </div>
           </div>
+
+          <div className="filter-group">
+            <h4 className="filter-group-title">Tags</h4>
+            <div className="tag-filters">
+              {['Premium', 'Luxury', 'Summer', 'Winter', 'Formal', 'Casual'].map(t => (
+                <button 
+                  key={t} 
+                  className={`tag-filter-btn ${filters.tag === t ? 'active' : ''}`} 
+                  onClick={() => setFilters(p => ({ ...p, tag: p.tag === t ? '' : t }))}
+                >
+                  #{t}
+                </button>
+              ))}
+            </div>
+          </div>
         </aside>
+
 
         {/* Products */}
         <div className="shop-products">

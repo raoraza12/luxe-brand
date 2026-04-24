@@ -28,6 +28,15 @@ router.get('/', async (req, res) => {
       where.sizes = { has: size };
     }
 
+    if (req.query.tag) {
+      where.tags = { has: req.query.tag };
+    }
+
+    if (req.query.color) {
+      where.colors = { path: ['$[*].name'], array_contains: req.query.color };
+    }
+
+
     const sortOptions = {
       'price-asc': { price: 'asc' },
       'price-desc': { price: 'desc' },

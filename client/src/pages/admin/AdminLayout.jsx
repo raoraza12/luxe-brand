@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { FiHome, FiBox, FiUsers, FiShoppingBag, FiTag, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiBox, FiUsers, FiShoppingBag, FiTag, FiLogOut, FiSettings } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import './Admin.css';
 
@@ -13,6 +13,7 @@ const AdminLayout = () => {
     { name: 'Orders', path: '/admin/orders', icon: <FiShoppingBag size={18} /> },
     { name: 'Users', path: '/admin/users', icon: <FiUsers size={18} /> },
     { name: 'Coupons', path: '/admin/coupons', icon: <FiTag size={18} /> },
+    { name: 'Settings', path: '/admin/settings', icon: <FiSettings size={18} /> },
   ];
 
   return (

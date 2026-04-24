@@ -3,32 +3,33 @@ import { Link } from 'react-router-dom';
 import { FiArrowRight, FiStar, FiTruck, FiRefreshCw, FiShield, FiAward } from 'react-icons/fi';
 import API from '../api';
 import ProductCard from '../components/ProductCard';
+import { useSettings } from '../context/SettingsContext';
 import './Home.css';
 
 const heroSlides = [
   {
     tag: 'New Collection 2026',
-    title: 'Dress Like\nRoyalty',
-    subtitle: "Discover LUXE's newest masterpieces — where every thread tells a story of elegance.",
+    title: 'THE ART OF\nELITE TAILORING',
+    subtitle: "Experience the pinnacle of luxury with our meticulously crafted garments, designed for those who command excellence.",
     cta: 'Explore Collection',
     ctaLink: '/shop',
-    bg: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80',
+    bg: 'https://images.unsplash.com/photo-1594932224491-ca2e36509f6e?w=1400&q=80',
   },
   {
     tag: 'Women\'s Edit',
-    title: 'Power &\nGrace',
-    subtitle: "Curated pieces for the modern woman who commands every room she walks into.",
+    title: 'GRACE IN\nEVERY MOTION',
+    subtitle: "Curated pieces for the modern woman who values timeless elegance and effortless sophistication.",
     cta: 'Shop Women',
     ctaLink: '/shop?category=Women',
-    bg: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1400&q=80',
+    bg: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1400&q=80',
   },
   {
     tag: 'Men\'s Essentials',
-    title: 'Suits That\nSpeak',
-    subtitle: "Precision tailoring. Timeless style. Every suit is a statement of quiet confidence.",
+    title: 'DEFINING\nMODERN LUXE',
+    subtitle: "Precision tailoring meets organic textures. Every stitch is a statement of refined taste.",
     cta: 'Shop Men',
     ctaLink: '/shop?category=Men',
-    bg: 'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=1400&q=80',
+    bg: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=80',
   },
 ];
 
@@ -46,6 +47,7 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const { settings } = useSettings();
   const [slide, setSlide] = useState(0);
   const [featured, setFeatured] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
@@ -80,9 +82,11 @@ export default function Home() {
         <div className="container hero-content" key={slide}>
           <span className="gold-label" style={{ animation: 'fadeUp 0.5s ease' }}>{current.tag}</span>
           <h1 className="hero-title" style={{ animation: 'fadeUp 0.6s ease 0.1s both' }}>
-            {current.title.split('\n').map((line, i) => <span key={i}>{line}<br /></span>)}
+            {(slide === 0 && settings.homeHeroTitle) ? settings.homeHeroTitle : current.title}
           </h1>
-          <p className="hero-subtitle" style={{ animation: 'fadeUp 0.6s ease 0.2s both' }}>{current.subtitle}</p>
+          <p className="hero-subtitle" style={{ animation: 'fadeUp 0.6s ease 0.2s both' }}>
+            {(slide === 0 && settings.homeHeroSub) ? settings.homeHeroSub : current.subtitle}
+          </p>
           <div className="hero-actions" style={{ animation: 'fadeUp 0.6s ease 0.3s both' }}>
             <Link to={current.ctaLink} className="btn-primary hero-cta">{current.cta} <FiArrowRight /></Link>
             <Link to="/shop" className="btn-outline">View All</Link>

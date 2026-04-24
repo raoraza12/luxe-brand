@@ -1,9 +1,5 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const Product = require('./models/Product');
-const User = require('./models/User');
-
-dotenv.config();
+const prisma = require('./lib/prisma');
+const bcrypt = require('bcryptjs');
 
 const unsplashMen = [
   'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&q=80',
@@ -52,19 +48,57 @@ const products = [
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
-    await Product.deleteMany({});
-    await User.deleteMany({});
-    await Product.insertMany(products);
+    console.log('✨ Starting database seed...');
+    
+    // Clear existing data (orders/reviews first due to FKs)
+    await prisma.orderItem.deleteMany({});
+    await prisma.order.deleteMany({});
+    await prisma.review.deleteMany({});
+    await prisma.product.deleteMany({});
+    await prisma.user.deleteMany({});
+    await prisma.coupon.deleteMany({});
+    
+    console.log('🗑️  Cleared existing data.');
+
+    // Seed Products
+    for (const p of products) {
+        await prisma.product.create({ data: p });
+    }
     console.log(`✅ Seeded ${products.length} products`);
-    await User.create({ name: 'Admin User', email: 'admin@luxe.com', password: 'admin123', role: 'admin' });
-    await User.create({ name: 'Test User', email: 'test@luxe.com', password: 'test1234', role: 'user' });
+
+    // Seed Users (Manually hash passwords)
+    const adminPassword = await bcrypt.hash('admin123', 12);
+    const userPassword = await bcrypt.hash('test1234', 12);
+
+    await prisma.user.create({
+      data: { name: 'Admin User', email: 'admin@luxe.com', password: adminPassword, role: 'admin' }
+    });
+    await prisma.user.create({
+      data: { name: 'Test User', email: 'test@luxe.com', password: userPassword, role: 'user' }
+    });
+
     console.log('✅ Seeded admin and test users');
-    process.exit();
+    
+    // Seed a Coupon
+    await prisma.coupon.create({
+        data: {
+            code: 'LUXE10',
+            discountType: 'percentage',
+            discountValue: 10,
+            minPurchaseAmount: 1000,
+            expirationDate: new Date('2026-12-31'),
+            isActive: true
+        }
+    });
+    console.log('✅ Seeded sample coupon');
+
+    console.log('✨ Seeding completed successfully!');
+    process.exit(0);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Seeding failed:', err);
     process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 

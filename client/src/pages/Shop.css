@@ -48,20 +48,22 @@
 
 /* Filter Sidebar */
 .filter-sidebar {
-  width: 260px; flex-shrink: 0;
+  width: 280px; flex-shrink: 0;
   background: var(--bg-card); border: 1px solid var(--border-light);
   border-radius: var(--radius-lg); padding: 24px;
   position: sticky; top: calc(var(--nav-height) + 20px);
   max-height: calc(100vh - var(--nav-height) - 40px); overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
 .filter-sidebar-header {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light);
 }
-.filter-sidebar-title { font-weight: 700; color: var(--cream); font-size: 0.9rem; flex: 1; }
-.clear-filters { font-size: 0.75rem; color: var(--red); background: none; transition: opacity 0.2s; }
+.filter-sidebar-title { font-weight: 700; color: var(--cream); font-size: 0.95rem; flex: 1; }
+.clear-filters { font-size: 0.75rem; color: var(--red); background: none; transition: opacity 0.2s; cursor: pointer; }
 .clear-filters:hover { opacity: 0.8; }
-.filter-close-btn { display: none; background: none; color: var(--text-secondary); }
+.filter-close-btn { display: none; background: none; color: var(--text-secondary); cursor: pointer; }
 
 .filter-group { margin-bottom: 24px; }
 .filter-group-title {
@@ -108,22 +110,39 @@
 .no-products h3 { color: var(--cream); font-size: 1.2rem; }
 .no-products p { font-size: 0.9rem; }
 
-@media (max-width: 1024px) {
-  .filter-sidebar { display: none; }
-  .filter-sidebar.open {
-    display: block; position: fixed; top: 0; left: 0; bottom: 0; z-index: 1200;
-    border-radius: 0; width: 100%; max-width: 320px;
-    animation: slideInRight 0.3s ease;
-    box-shadow: 20px 0 60px rgba(0,0,0,0.8);
+@media (max-width: 1100px) {
+  .shop-body { gap: 20px; }
+  .filter-sidebar { 
+    position: fixed; top: 0; left: -100%; bottom: 0; 
+    z-index: 1200; border-radius: 0; width: 300px;
+    height: 100vh; max-height: 100vh; 
+    background: var(--bg-card); box-shadow: 20px 0 60px rgba(0,0,0,0.8);
+    opacity: 0; pointer-events: none;
   }
+  .filter-sidebar.open { left: 0; opacity: 1; pointer-events: auto; }
   .filter-close-btn { display: flex; }
-  .shop-body { padding-top: 20px; }
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 600px) {
-  .shop-grid { grid-template-columns: 1fr; gap: 16px; }
-  .shop-header-inner { flex-direction: column; align-items: stretch; text-align: center; }
+@media (max-width: 768px) {
+  .shop-header-inner { flex-direction: column; align-items: stretch; gap: 16px; }
   .shop-controls { flex-direction: column; width: 100%; }
   .search-bar-shop, .sort-select-wrap, .filter-toggle-btn { width: 100%; }
   .sort-select { width: 100%; }
+  .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
+@media (max-width: 500px) {
+  .shop-grid { grid-template-columns: 1fr; }
+  .section-title { font-size: 1.5rem; }
+}
+
+/* Tag Filters */
+.tag-filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.tag-filter-btn {
+  padding: 6px 12px; border: 1px solid var(--border-light); border-radius: 20px;
+  background: var(--bg-elevated); color: var(--text-muted); font-size: 0.75rem;
+  transition: all 0.2s;
+}
+.tag-filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tag-filter-btn.active { background: var(--gold); color: #1a1000; border-color: var(--gold); }

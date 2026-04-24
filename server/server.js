@@ -2,10 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-dotenv.config();
+const prisma = require('./lib/prisma');
 
 const app = express();
 
@@ -24,26 +21,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Temporary Seed Route (Prisma version)
-app.get('/api/seed-database', async (req, res) => {
-  try {
-    const products = [
-      { name: 'Obsidian Slim Suit', slug: 'obsidian-slim-suit', description: 'Premium obsidian wool blend suit.', price: 28999, comparePrice: 35000, category: 'Men', subcategory: 'Suits', images: ['https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&q=80', 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&q=80'], sizes: ['S','M','L','XL','XXL'], colors: [{name:'Black',hex:'#1a1a1a'},{name:'Charcoal',hex:'#36454F'}], stock: 45, featured: true, bestseller: true, material: '80% Wool, 20% Polyester', care: 'Dry clean only' },
-      { name: 'Ivory Linen Blazer', slug: 'ivory-linen-blazer', description: 'Breathable linen blazer.', price: 14999, comparePrice: 18500, category: 'Men', subcategory: 'Blazers', images: ['https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&q=80'], sizes: ['S','M','L','XL'], colors: [{name:'Ivory',hex:'#FFFFF0'}], stock: 30, featured: true, newArrival: true, material: '100% Linen', care: 'Hand wash cold' }
-    ];
-    
-    await prisma.product.deleteMany({});
-    
-    for (const p of products) {
-      await prisma.product.create({ data: p });
-    }
-
-    res.json({ message: 'Supabase Database seeded successfully! ✨', count: products.length });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Seeding failed', error: err.message });
-  }
-});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));

@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiTwitter, FiFacebook, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { useSettings } from '../context/SettingsContext';
 import './Footer.css';
 
 export default function Footer() {
+  const { settings } = useSettings();
   return (
     <footer className="footer">
       <div className="footer-glow" />
       <div className="container">
         <div className="footer-top">
           <div className="footer-brand">
-            <span className="footer-logo">LUXE</span>
+            <span className="footer-logo">{settings.siteName || 'LUXE'}</span>
             <p className="footer-tagline">Haute Couture</p>
             <p className="footer-desc">
               Elevating everyday style through meticulously crafted garments. Where luxury meets wearability.
@@ -53,8 +55,8 @@ export default function Footer() {
 
           <div className="footer-col footer-contact">
             <h4 className="footer-col-title">Get In Touch</h4>
-            <div className="contact-item"><FiMail size={14} /><span>hello@luxebrand.com</span></div>
-            <div className="contact-item"><FiPhone size={14} /><span>+92 300 1234567</span></div>
+            <div className="contact-item"><FiMail size={14} /><span>{settings.contactEmail || 'hello@luxebrand.com'}</span></div>
+            <div className="contact-item"><FiPhone size={14} /><span>{settings.contactPhone || '+92 300 1234567'}</span></div>
             <div className="contact-item"><FiMapPin size={14} /><span>Lahore, Pakistan</span></div>
 
             <div className="newsletter">
@@ -68,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p className="footer-copy">© 2026 LUXE Haute Couture. All rights reserved.</p>
+          <p className="footer-copy">© 2026 {settings.siteName || 'LUXE'} Haute Couture. All rights reserved.</p>
           <div className="footer-bottom-links">
             <a href="#" className="footer-bottom-link">Privacy Policy</a>
             <a href="#" className="footer-bottom-link">Terms of Service</a>

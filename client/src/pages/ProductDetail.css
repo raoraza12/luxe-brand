@@ -48,9 +48,9 @@
   font-size: 0.78rem; font-weight: 700; background: rgba(224,85,85,0.15);
   color: var(--red); padding: 4px 10px; border-radius: 20px;
 }
-
 /* Selectors */
 .selector-group { margin-bottom: 20px; }
+
 .selector-label { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px; display: block; }
 .selector-label strong { color: var(--cream); }
 
